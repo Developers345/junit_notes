@@ -141,7 +141,7 @@ class AppTest {
     UnitsCalculator unitsCalculator = new UnitsCalculator();
     int actualCentimeters = unitsCalculator.convertMetersToCentimeters(meters);
 
-    if (actualCentimeters == 55) {
+    if (actualCentimeters == 550.0) {
       System.out.println(".");
     } else {
       System.out.println("f");
