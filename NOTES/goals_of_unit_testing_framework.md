@@ -149,3 +149,328 @@ class AppTest {
   }
 }
 ```
+
+
+## #2. Break-down Test Logic Per Class (One Testcase Class Per Class)
+
+**In short:**  
+👉 Maintain **one testcase class for each original class**.
+
+---
+
+## Sample Application Classes
+
+```java
+class Calculator {
+  int add(int a, int b) {
+    return a + b;
+  }
+}
+
+class UnitsCalculator {
+  double convertMetersToCentimeters(double meters) {
+    return meters * 100;
+  }
+}
+
+class Square {
+  double area(double side) {
+    return side * side;
+  }
+}
+````
+
+---
+
+## Problem With a Single Test Class
+
+```java
+class AppTest {
+  public static void main(String[] args) {
+    int a = 10;
+    int b = 20;
+    double meters = 5.5;
+    double side = 4.3;
+
+    Calculator calculator = new Calculator();
+    int actualSum = calculator.add(a, b);
+    if (actualSum == 30) {
+      System.out.println(".");
+    } else {
+      System.out.println("f");
+    }
+
+    UnitsCalculator unitsCalculator = new UnitsCalculator();
+    int actualCentimeters = unitsCalculator.convertMetersToCentimeters(meters);
+    if (actualCentimeters == 55) {
+      System.out.println(".");
+    } else {
+      System.out.println("f");
+    }
+
+    Square square = new Square();
+    int actualArea = square.area(side);
+    if (actualArea == 18.49) {
+      System.out.println(".");
+    } else {
+      System.out.println("f");
+    }
+  }
+}
+```
+
+### Issues
+
+* Test logic for **multiple classes** is mixed together
+* Difficult to read, understand, and maintain
+* Becomes complex as the application grows
+
+---
+
+## Recommended Approach
+
+👉 **Break down test logic into multiple testcase classes**
+
+* One testcase class per each class under test
+* Each testcase class contains logic to test all methods of the original class
+
+---
+
+## Testcase Class Naming & Structure Rules
+
+1. **Testcase class name**
+
+   * `OriginalClassName + Test`
+   * Example: `CalculatorTest`
+
+2. **Package structure**
+
+   * Testcase class should be in the **same package** as the original class
+
+3. **Source separation**
+
+   * Application source code and test code should be separated
+   * Test code should **never be packaged or shipped** with the application
+
+---
+
+## Recommended Project Structure
+
+```
+basicjava
+│
+├─ src
+│  └─ pkg1
+│     └─ Calculator.java
+│
+├─ testSrc
+│  └─ pkg1
+│     └─ CalculatorTest.java
+│
+├─ bin
+│  └─ pkg1
+│     └─ Calculator.class
+│
+├─ testBin
+│  └─ pkg1
+│     └─ CalculatorTest.class
+```
+
+---
+
+## Packaging Command
+
+```bash
+jar -cvf basicjava.jar -C bin/ .
+```
+
+### Notes
+
+* Compile `src/` → output to `bin/`
+* Compile `testSrc/` with classpath pointing to `bin/` → output to `testBin/`
+* While executing tests, set classpath to:
+
+  * `bin/`
+  * `testBin/`
+  * third-party libraries
+* While packaging (`jar` / `war`), include **only `bin/` classes**
+
+---
+
+## Application Classes With Packages
+
+```java
+package pkg1;
+class Calculator {
+  int add(int a, int b) {
+    return a + b;
+  }
+}
+```
+
+```java
+package pkg2;
+class UnitsCalculator {
+  double convertMetersToCentimeters(double meters) {
+    return meters * 100;
+  }
+}
+```
+
+```java
+package pkg3;
+class Square {
+  double area(double side) {
+    return side * side;
+  }
+}
+```
+
+---
+
+## Separate Testcase Classes
+
+### CalculatorTest
+
+```java
+package pkg1;
+class CalculatorTest {
+  public static void main(String[] args) {
+    int a = 10;
+    int b = 20;
+
+    Calculator calculator = new Calculator();
+    int actualSum = calculator.add(a, b);
+
+    if (actualSum == 30) {
+      System.out.println(".");
+    } else {
+      System.out.println("f");
+    }
+  }
+}
+```
+
+### SquareTest
+
+```java
+package pkg3;
+class SquareTest {
+  public static void main(String[] args) {
+    double side = 4.3;
+
+    Square square = new Square();
+    int actualArea = square.area(side);
+
+    if (actualArea == 18.49) {
+      System.out.println(".");
+    } else {
+      System.out.println("f");
+    }
+  }
+}
+```
+
+---
+
+## Still a Problem…
+
+Even though separating testcase classes improves **readability and maintainability**, there is still a challenge:
+
+* All test logic is written inside the `main()` method
+* Difficult to manage multiple test scenarios for the same method
+
+---
+
+## Better Approach: One Testcase Method Per Test
+
+Instead of testing all methods inside `main()`,
+👉 **Create separate testcase methods for each test scenario**
+
+---
+
+## Rules for Writing Testcase Methods
+
+1. Testcase methods **need not be public**
+
+2. Return type must always be **void**
+
+3. Testcase methods:
+
+   * Must report **PASS / FAIL**
+   * Should not return any value
+
+4. Naming convention:
+
+   * Start with `test`
+   * Followed by method name and scenario
+
+   Examples for `add(int a, int b)`:
+
+   * `testAddWithPositiveNumbers()`
+   * `testAddWithNegativeNumbers()`
+   * `testAddWithZeros()`
+
+5. Testcase methods **should not take parameters**
+
+   * Inputs are predefined (**test fixtures**)
+
+---
+
+## Improved CalculatorTest With Testcase Methods
+
+```java
+package pkg1;
+class CalculatorTest {
+
+  void testAddWithPositiveNumbers() {
+    int a = 10;
+    int b = 20;
+
+    Calculator calculator = new Calculator();
+    int actualSum = calculator.add(a, b);
+
+    if (actualSum == 30) {
+      System.out.println(".");
+    } else {
+      System.out.println("f");
+    }
+  }
+
+  void testAddWithNegativeNumbers() {
+    int a = -10;
+    int b = -20;
+
+    Calculator calculator = new Calculator();
+    int actualSum = calculator.add(a, b);
+
+    if (actualSum == -30) {
+      System.out.println(".");
+    } else {
+      System.out.println("f");
+    }
+  }
+
+  void testAddWithZeros() {
+    int a = 0;
+    int b = 0;
+
+    Calculator calculator = new Calculator();
+    int actualSum = calculator.add(a, b);
+
+    if (actualSum == 0) {
+      System.out.println(".");
+    } else {
+      System.out.println("f");
+    }
+  }
+
+  public static void main(String[] args) {
+    CalculatorTest calculatorTest = new CalculatorTest();
+    calculatorTest.testAddWithPositiveNumbers();
+    calculatorTest.testAddWithNegativeNumbers();
+    calculatorTest.testAddWithZeros();
+  }
+}
+```
+
