@@ -210,7 +210,4 @@ reverseEnabled=false
 
 ## Output
 
-```
 <img width="1718" height="603" alt="Screenshot 2026-01-24 101228" src="https://github.com/user-attachments/assets/78873ddf-9766-4d2b-9bc1-81e00247425b" />
-
-```
